@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://chkg2uqq03cc"]
 
-[ext_resource type="Script" uid="uid://cb3nlehdsc30d" path="res://wor;d.gd" id="1_vig1r"]
+[ext_resource type="Script" uid="uid://cb3nlehdsc30d" path="res://scripts/wor;d.gd" id="1_vig1r"]
 [ext_resource type="PackedScene" uid="uid://rxwmp5fdbk8x" path="res://character_body_2d.tscn" id="2_k5327"]
 [ext_resource type="PackedScene" uid="uid://byv75e8g3a0hh" path="res://area_2d.tscn" id="4_gpj1u"]
 
@@ -30,5 +30,5 @@ position = Vector2(1024, 536)
 ability = 2
 
 [node name="CharacterBody2D" parent="." instance=ExtResource("2_k5327")]
-position = Vector2(360, 408)
+position = Vector2(360, 400)
 scale = Vector2(0.9999997, 0.99999976)

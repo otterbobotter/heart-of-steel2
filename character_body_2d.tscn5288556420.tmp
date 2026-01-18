@@ -36,8 +36,6 @@ var jumps = 0
 # Dash tracking
 var is_dashing = false
 var dash_timer = 0.0
-var dash_cooldown = 1  
-var dash_cooldown_timer = 0.0
 
 # Stats
 var health = 100
@@ -54,10 +52,6 @@ func _ready() -> void:
 			state.player = self
 
 func _physics_process(delta: float) -> void:
-	# Update dash cooldown
-	if dash_cooldown_timer > 0:
-		dash_cooldown_timer -= delta
-	
 	move_and_slide()
 
 func get_input_direction() -> float:
@@ -70,9 +64,6 @@ func apply_gravity(delta: float) -> void:
 func reset_jumps() -> void:
 	if is_on_floor():
 		jumps = max_jumps
-
-func can_dash() -> bool:
-	return has_dash and dash_cooldown_timer <= 0
 
 func unlock_ability(ability_name: String) -> void:
 	match ability_name:
@@ -134,30 +125,30 @@ gravity = Vector2(960, 80)
 initial_velocity_max = 50.0
 scale_amount_min = 0.1
 scale_amount_max = 0.1
-color = Color(1, 0.68235296, 1, 0.5686275)
+color = Color(0.50534403, 0.5053441, 0.50534385, 0.5686275)
 hue_variation_min = 0.35
 hue_variation_max = 1.0
 
 [node name="StateMachine" type="Node" parent="."]
 script = ExtResource("2_6ct3r")
 
-[node name="Idle" type="Node" parent="StateMachine"]
+[node name="idle" type="Node" parent="StateMachine"]
 script = ExtResource("3_1kp85")
 
-[node name="Run" type="Node" parent="StateMachine"]
+[node name="run" type="Node" parent="StateMachine"]
 script = ExtResource("4_qnedo")
 
-[node name="Jump" type="Node" parent="StateMachine"]
+[node name="jump" type="Node" parent="StateMachine"]
 script = ExtResource("5_wyqjk")
 
-[node name="Dash" type="Node" parent="StateMachine"]
+[node name="dash" type="Node" parent="StateMachine"]
 script = ExtResource("6_k85er")
 
-[node name="WallSlide" type="Node" parent="StateMachine"]
+[node name="wallSlide" type="Node" parent="StateMachine"]
 script = ExtResource("7_ebjds")
 
-[node name="WallJUmp" type="Node" parent="StateMachine"]
+[node name="wallJump" type="Node" parent="StateMachine"]
 script = ExtResource("8_y1dt5")
 
-[node name="Fall" type="Node" parent="StateMachine"]
+[node name="fall_state" type="Node" parent="StateMachine"]
 script = ExtResource("9_au0nh")
