@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3 uid="uid://chkg2uqq03cc"]
+
+[ext_resource type="Script" uid="uid://cb3nlehdsc30d" path="res://wor;d.gd" id="1_vig1r"]
+[ext_resource type="PackedScene" uid="uid://rxwmp5fdbk8x" path="res://character_body_2d.tscn" id="2_k5327"]
+[ext_resource type="PackedScene" uid="uid://byv75e8g3a0hh" path="res://area_2d.tscn" id="4_gpj1u"]
+
+[node name="wor;d" type="Node2D"]
+script = ExtResource("1_vig1r")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(112, -8)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+position = Vector2(248, 480.00003)
+scale = Vector2(0.8709335, 0.7717391)
+polygon = PackedVector2Array(-312.30856, -611.6056, -312.30856, -145.12674, -211.26756, -145.12674, -211.26756, -114.02814, -156.1543, -145.12674, -156.1543, -41.464783, -211.45544, -62.47917, -211.26756, -41.464783, -312.30856, -41.464783, -312.30856, 134.76056, -45.927734, 134.76056, -45.927734, -51.830994, 27.55661, -51.830994, 27.55661, 134.76056, 174.52536, 134.7605, 174.52536, -414.64792, 238.82419, -414.64792, 238.82419, 134.7605, 238.82419, 207.32391, 321.4941, 207.32391, 321.4941, 134.76056, 459.2773, 134.76056, 569.5038, 134.76056, 753.2147, 134.76056, 838.47363, 139.05402, 835.88464, -611.6056, 909.369, -611.6056, 909.369, 228.05634, 845.0702, 228.05634, -303.12305, 228.05634, -413.34958, 228.05634, -413.34958, -611.6056)
+
+[node name="Polygon2D" type="Polygon2D" parent="StaticBody2D/CollisionPolygon2D"]
+color = Color(0, 0.8033924, 0.9466471, 1)
+
+[node name="Area2D" parent="." instance=ExtResource("4_gpj1u")]
+position = Vector2(112, 336)
+
+[node name="Area2D2" parent="." instance=ExtResource("4_gpj1u")]
+position = Vector2(136, 552)
+ability = 1
+
+[node name="Area2D3" parent="." instance=ExtResource("4_gpj1u")]
+position = Vector2(1024, 536)
+ability = 2
+
+[node name="CharacterBody2D" parent="." instance=ExtResource("2_k5327")]
+position = Vector2(360, 408)
+scale = Vector2(0.9999997, 0.99999976)

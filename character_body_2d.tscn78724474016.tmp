@@ -1,0 +1,88 @@
+[gd_scene load_steps=4 format=3 uid="uid://rxwmp5fdbk8x"]
+
+[ext_resource type="Texture2D" uid="uid://cbrd61vx6fhsv" path="res://char for now.png" id="1_f50pn"]
+
+[sub_resource type="GDScript" id="GDScript_f50pn"]
+script/source = "extends CharacterBody2D
+
+const SPEED = 500.0
+const JUMP_VELOCITY = -700.0
+const MASS = 1.5
+const DASH_SPEED = 1000
+const DASH_DURATION = 0.2
+
+var is_dashing = false
+var dash_timer = 0.0
+
+@onready var dash_particles = $CPUParticles2D
+
+func _physics_process(delta: float) -> void:
+	player_controller(delta)
+	move_and_slide()
+
+func apply_gravity(delta):
+	if not is_on_floor() and not is_dashing:
+		velocity += get_gravity() * MASS * delta
+
+func handle_jump():
+	if Input.is_action_just_pressed(\"ui_accept\") and is_on_floor():
+		velocity.y = JUMP_VELOCITY
+
+func handle_dash(direction, delta):
+	if is_dashing:
+		dash_particles.emitting = true
+		dash_timer -= delta
+		if dash_timer <= 0:
+			is_dashing = false
+			dash_particles.emitting = false
+	
+	if Input.is_action_just_pressed(\"dash_key\") and not is_dashing:
+		is_dashing = true
+		dash_timer = DASH_DURATION
+		velocity.x = direction * DASH_SPEED
+		velocity.y = 0
+
+func Horizontal_movement(direction):
+	if is_dashing:
+		return
+	
+	if direction:
+		velocity.x = direction * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+
+func player_controller(delta):
+	var direction := Input.get_axis(\"ui_left\", \"ui_right\")
+	
+	handle_dash(direction, delta)
+	apply_gravity(delta)
+	handle_jump()
+	Horizontal_movement(direction)
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_f50pn"]
+radius = 24.0
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+floor_snap_length = 7.6
+script = SubResource("GDScript_f50pn")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_f50pn")
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D"]
+position = Vector2(0, 2)
+scale = Vector2(0.18745181, 0.21222268)
+texture = ExtResource("1_f50pn")
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 30
+lifetime = 0.4
+emission_shape = 1
+emission_sphere_radius = 34.0
+gravity = Vector2(960, 80)
+initial_velocity_max = 50.0
+color = Color(0, 1, 1, 0.5686275)
+hue_variation_min = 0.35
+hue_variation_max = 1.0

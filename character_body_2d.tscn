@@ -1,0 +1,176 @@
+[gd_scene load_steps=5 format=3 uid="uid://rxwmp5fdbk8x"]
+
+[ext_resource type="Texture2D" uid="uid://cbrd61vx6fhsv" path="res://char for now.png" id="1_f50pn"]
+
+[sub_resource type="GDScript" id="GDScript_f50pn"]
+script/source = "extends CharacterBody2D
+
+const SPEED = 500.0
+const JUMP_VELOCITY = -700.0
+const MASS = 1.5
+const DASH_SPEED = 1000
+const DASH_DURATION = 0.2
+const WALL_SLIDE_SPEED = 150.0
+const WALL_JUMP_FORCE_X = 600.0
+const WALL_JUMP_FORCE_Y = -700.0
+
+var has_dash = false
+var has_double_jump = false
+var has_wall_jump = false
+
+var is_wall_sliding = false
+var is_dashing = false
+var dash_timer = 0.0
+
+var max_jumps = 1
+var jumps = 0
+
+var health = 100
+
+@onready var dash_effect = $dash_effect
+@onready var wall_slide_effect = $wall_slide_effect
+
+func _physics_process(delta: float) -> void:
+	player_controller(delta)
+	move_and_slide()
+
+func apply_gravity(delta):
+	if not is_on_floor() and not is_dashing:
+		velocity += get_gravity() * MASS * delta
+
+func handle_jump():
+	if is_on_floor():
+		jumps = max_jumps
+
+	if has_wall_jump and is_wall_sliding and Input.is_action_just_pressed(\"ui_accept\"):
+		var wall_dir = get_wall_normal().x
+		velocity.y = WALL_JUMP_FORCE_Y
+		velocity.x = wall_dir * WALL_JUMP_FORCE_X
+		is_wall_sliding = false
+		return
+
+	if Input.is_action_just_pressed(\"ui_accept\") and jumps > 0:
+		velocity.y = JUMP_VELOCITY
+		jumps -= 1
+
+func handle_wall_slide(direction):
+	if not has_wall_jump or is_dashing:
+		is_wall_sliding = false
+		wall_slide_effect.emitting = false
+		return
+
+	if is_on_floor():
+		is_wall_sliding = false
+		wall_slide_effect.emitting = false
+		return
+
+	if is_on_wall() and velocity.y > 0 and direction != 0:
+		is_wall_sliding = true
+		velocity.y = min(velocity.y, WALL_SLIDE_SPEED)
+		velocity.x += JUMP_VELOCITY
+	else:
+		is_wall_sliding = false
+
+	if is_wall_sliding:
+		var wall_dir = -get_wall_normal().x
+		wall_slide_effect.direction = Vector2(wall_dir * 200, 0)
+	wall_slide_effect.emitting = is_wall_sliding
+
+func handle_dash(direction, delta):
+	if not has_dash:
+		return
+
+	if is_dashing:
+		dash_effect.emitting = true
+		dash_timer -= delta
+		if dash_timer <= 0:
+			is_dashing = false
+			dash_effect.emitting = false
+
+	if Input.is_action_just_pressed(\"dash_key\") and not is_dashing:
+		is_dashing = true
+		dash_timer = DASH_DURATION
+		velocity.x = direction * DASH_SPEED
+		velocity.y = 0
+		print(\"dash button clicked\")
+		
+func Horizontal_movement(direction):
+	if is_dashing:
+		return
+
+	if direction:
+		velocity.x = direction * SPEED
+	else:
+		velocity.x = move_toward(velocity.x, 0, SPEED)
+
+func player_controller(delta):
+	var direction := Input.get_axis(\"ui_left\", \"ui_right\")
+	handle_dash(direction, delta)
+	apply_gravity(delta)
+	handle_wall_slide(direction)
+	handle_jump()
+	Horizontal_movement(direction)
+
+func unlock_ability(ability_name: String):
+	match ability_name:
+		\"dash\":
+			has_dash = true
+			print(\"unlocked dash\")
+		\"double_jump\":
+			has_double_jump = true
+			max_jumps = 2
+			print(\"unlocked double jump\")
+		\"wall_jump\":
+			has_wall_jump = true
+			print(\"wall jump unlocked\")
+"
+
+[sub_resource type="Curve" id="Curve_f50pn"]
+_data = [Vector2(0.110465124, 0.24719107), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_f50pn"]
+radius = 24.0
+
+[node name="CharacterBody2D" type="CharacterBody2D"]
+floor_snap_length = 7.6
+script = SubResource("GDScript_f50pn")
+
+[node name="wall_slide_effect" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 30
+texture = ExtResource("1_f50pn")
+lifetime = 0.17
+emission_shape = 3
+emission_rect_extents = Vector2(20, 25)
+direction = Vector2(1000, 0)
+spread = 0.0
+initial_velocity_max = 183.65
+angular_velocity_min = 720.0
+angular_velocity_max = 720.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+scale_amount_curve = SubResource("Curve_f50pn")
+color = Color(0.4817894, 0.48178953, 0.4817894, 0.7607843)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_f50pn")
+
+[node name="Sprite2D" type="Sprite2D" parent="CollisionShape2D"]
+scale = Vector2(0.18745181, 0.21222268)
+texture = ExtResource("1_f50pn")
+
+[node name="dash_effect" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 30
+texture = ExtResource("1_f50pn")
+lifetime = 0.4
+emission_shape = 1
+emission_sphere_radius = 66.98
+gravity = Vector2(960, 80)
+initial_velocity_max = 50.0
+scale_amount_min = 0.1
+scale_amount_max = 0.1
+color = Color(0.50534403, 0.5053441, 0.50534385, 0.5686275)
+hue_variation_min = 0.35
+hue_variation_max = 1.0
